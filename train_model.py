@@ -2,8 +2,8 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from omegaconf import DictConfig
 import hydra
-
-from model import Model
+import torch
+from model import AudioClass
 from dataset import ClassificationDataModule
 
 
@@ -11,7 +11,7 @@ from dataset import ClassificationDataModule
 def main(cfg: DictConfig) -> None:
 
     dm = ClassificationDataModule(cfg)
-    model = Model(cfg)
+    model = AudioClass(cfg)
 
     checkpoint_callback = ModelCheckpoint(
         dirpath=cfg.checkpoint_dir,
@@ -20,8 +20,8 @@ def main(cfg: DictConfig) -> None:
     )
 
     stop_callback = EarlyStopping(
-        monitor='val_loss',
-        mode='max',
+        monitor='train_loss',
+        mode='min',
         patience=150,
         verbose=cfg.verbose,
     )
@@ -30,13 +30,12 @@ def main(cfg: DictConfig) -> None:
         callbacks=[checkpoint_callback, stop_callback],
         precision=16,
         accelerator='auto',
-        max_epochs=1000
+        max_epochs=2000
     )
 
     trainer.fit(model, dm)
     trainer.save_checkpoint(
-        cfg.checkpoint_dir+'/conv2d_yoav.ckpt')
-
-
+        cfg.checkpoint_dir+'/audio_class_v5.ckpt')
+    torch.save(model.state_dict(),'/root/audio_classification/convertion_to_pt/audio_classifier_v5.pth')
 if __name__ == "__main__":
     main()

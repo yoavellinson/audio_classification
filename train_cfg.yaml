@@ -3,7 +3,7 @@ defaults:
   - hydra/hydra_logging: colorlog
 
 # Dataset
-wav_paths: /root/audio_classification/clean
+wav_paths: /root/audio_classification/clean_tr90
 sr: 16000
 dt: 0.032
 n_classes: 10

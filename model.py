@@ -2,7 +2,6 @@ from locale import normalize
 import torch
 from torch import nn
 from torchaudio.transforms import MelSpectrogram
-import torchaudio
 import torch
 from torch import nn, optim
 from torch.nn import functional as F
@@ -10,9 +9,9 @@ import torch.nn as nn
 import pytorch_lightning as pl
 
 
-class Model(pl.LightningModule):
+class AudioClass(pl.LightningModule):
     def __init__(self, cfg):
-        super(Model, self).__init__()
+        super(AudioClass, self).__init__()
         self.in_channels = 1
         self.out_channels = cfg.n_classes
         self.lr = cfg.lr
@@ -23,15 +22,17 @@ class Model(pl.LightningModule):
         self.transform = MelSpectrogram(sample_rate=self.sr, n_fft=512, win_length=400,
                                         hop_length=5, n_mels=128, window_fn=torch.hann_window,norm='slaney',normalized=True,power=1)
         self.criterion = torch.nn.CrossEntropyLoss()
+        
+
 
         # layers
         self.bn = nn.BatchNorm2d(1)
-        self.conv1 = nn.Conv2d(1, 32, 5)
+        self.conv1 = nn.Conv2d(1, 32, 7)
         self.conv2 = nn.Conv2d(32, 64, 5)
-        self.conv3 = nn.Conv2d(64, 64, 5)
-        self.conv4 = nn.Conv2d(64, 32, 5)
+        self.conv3 = nn.Conv2d(64, 64, 3)
+        self.conv4 = nn.Conv2d(64, 32, 3)
         self.maxpool = nn.MaxPool2d(2, 2, 1)
-        self.fc1 = nn.Linear(768, 120)
+        self.fc1 = nn.Linear(1120, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
